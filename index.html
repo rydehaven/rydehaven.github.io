@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Indoor cycling: ride, race and train on your smart trainer.">
+<meta name="theme-color" content="#0e1013">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rydehaven">
+<title>Rydehaven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/*
+VOICE: indoor-trainer game HUD, calm and legible at a glance mid-effort.
+IDEA: a race bike computer + a course profile strip, floating over the 3D world.
+PICTURE: the world itself, full bleed; the elevation profile carries the route.
+COLOUR and TYPE: smoked-glass panels, white figures, safety-orange accent; Barlow Condensed numerals.
+LAYOUT: metrics top-left, controls bottom-left, profile across the bottom, texture slots in a right drawer.
+*/
+:root{color-scheme:dark;--glass:rgba(16,18,22,.72);--line:rgba(255,255,255,.14);--ink:#f4f4f0;--dim:#b7bcc2;--acc:#18d6c0}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%;background:#0e1013;color:var(--ink);font:15px/1.45 Barlow,system-ui,sans-serif;overflow:hidden}
+#view{position:fixed;inset:0}
+#view canvas{display:block}
+.glass{background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:12px}
+#hud{position:fixed;top:14px;left:14px;display:flex;flex-wrap:wrap;gap:4px 22px;padding:12px 18px;max-width:min(680px,calc(100vw - 260px))}
+#hud .met[hidden]{display:none}
+#skyRow[hidden]{display:none!important}
+#qualHint{position:fixed;left:50%;bottom:120px;transform:translateX(-50%);padding:10px 14px;z-index:6;display:flex;gap:12px;align-items:center;font-size:14px}
+#qualHint[hidden]{display:none}
+#climbNow{flex-basis:100%;font:600 16px 'Barlow Condensed',sans-serif;color:#bff5ee;min-height:0}
+#climbNow:empty{display:none}
+#finishBanner{position:fixed;left:50%;top:22%;transform:translateX(-50%);text-align:center;padding:18px 34px;z-index:5}
+#finishBanner b{display:block;font:700 52px/1 'Barlow Condensed',sans-serif;color:var(--acc)}
+#finishBanner span{font:600 18px 'Barlow Condensed',sans-serif}
+.met{display:flex;flex-direction:column}
+.met b{font:700 34px/1 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.met b small{font:500 15px 'Barlow Condensed';color:var(--dim);margin-left:3px}
+.met span{font-size:13px;color:var(--dim)}
+.met.pow b{color:var(--acc)}
+#ctrl{position:fixed;left:14px;bottom:112px;display:flex;gap:10px;align-items:center;padding:10px 12px;flex-wrap:wrap;max-width:calc(100vw - 28px)}
+#ctrl label{display:flex;gap:10px;align-items:center;font-size:14px;color:var(--dim)}
+input[type=range]{width:180px;accent-color:var(--acc);height:28px}
+button{font:600 14px Barlow,sans-serif;color:var(--ink);background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:8px;min-height:40px;padding:0 14px;cursor:pointer}
+button:hover{background:rgba(255,255,255,.16)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,.drop:focus-within{outline:2px solid var(--acc);outline-offset:2px}
+#profWrap{position:fixed;left:14px;right:14px;bottom:14px;padding:8px 12px 10px}
+#profWrap .row{display:flex;justify-content:space-between;font-size:13px;color:var(--dim);margin-bottom:4px;gap:12px}
+#profile{display:block;width:100%;height:58px;cursor:pointer}
+#panelBtn{position:fixed;top:14px;right:14px;background:var(--acc);border-color:var(--acc);color:#03201c}
+#panel{position:fixed;top:66px;right:14px;bottom:112px;width:340px;padding:14px;overflow:auto;transform:translateX(calc(100% + 20px));transition:transform .25s ease}
+body.panel-open #panel{transform:none}
+#panel h2{font:700 22px/1.1 'Barlow Condensed';margin:0 0 4px}
+#panel p{margin:0 0 12px;color:var(--dim);font-size:14px}
+.slot{border-top:1px solid var(--line);padding:12px 0}
+.slot.over .drop{border-color:var(--acc);background:rgba(24,214,192,.12)}
+.slot.busy{opacity:.5}
+.slot-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.m{font-size:13px;color:var(--dim);white-space:nowrap}
+.m input{width:64px;font:16px Barlow;background:#0006;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{font-size:12px;padding:3px 8px;border-radius:99px;border:1px solid var(--line);color:var(--dim)}
+.chip.on{border-color:#7fd17f;color:#c9f5c9}
+.drop{position:relative;display:block;border:1.5px dashed var(--line);border-radius:8px;padding:12px;text-align:center;font-size:13px;color:var(--dim);cursor:pointer;min-height:44px}
+.drop input{position:absolute;width:1px;height:1px;opacity:0}
+.note{font-size:12px;color:#bff5ee;margin-top:6px}
+#loading{position:fixed;inset:0;display:grid;place-items:center;font:700 26px 'Barlow Condensed';background:#0e1013;z-index:9}
+#mapsBtn{position:fixed;top:14px;right:128px}
+#mapName{font-weight:600}
+/* workout panel (in ride) */
+#wkt{position:fixed;top:14px;left:50%;transform:translateX(-50%);width:min(380px,calc(100vw - 28px));padding:10px 14px;z-index:4;display:flex;flex-direction:column;gap:4px}
+#wkt[hidden]{display:none}
+.wk-top{display:flex;justify-content:space-between;font-size:13px;color:var(--dim)}
+#wkBias{color:#bff5ee;font-variant-numeric:tabular-nums}
+.wk-now{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.wk-now b{font:700 34px/1 'Barlow Condensed',sans-serif;color:var(--acc);font-variant-numeric:tabular-nums}
+.wk-now span{font:600 16px 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums}
+#wkChart{width:100%;height:36px;display:block}
+#wkNext{font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
+@media(max-width:1250px){#wkt{left:auto;right:14px;transform:none;top:66px}}
+.devBtn{display:flex;align-items:center;gap:6px;min-height:44px}
+.devBtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.devBtn[hidden]{display:none}
+.devBtn.paired{border-color:var(--acc);color:var(--acc)}
+.h-top .devBtn{border-radius:999px;padding:0 14px}
+#devDlg{border:1px solid var(--line);border-radius:16px;background:#161b21;color:var(--ink);padding:0;width:min(480px,calc(100vw - 32px))}
+#devDlg::backdrop{background:rgba(0,0,0,.6)}
+.dev{display:flex;flex-direction:column;gap:12px;padding:22px}
+.dev h2{font:700 28px 'Barlow Condensed',sans-serif;margin:0}
+.dev-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.dev-row div{display:flex;flex-direction:column;gap:2px}
+.dev-row b{font:700 18px 'Barlow Condensed',sans-serif}
+.dev-row span{color:var(--dim);font-size:14px;font-variant-numeric:tabular-nums}
+.dev-row button{flex:none}
+.dev-note{margin:0;padding:12px 14px;border-radius:10px;background:rgba(255,196,80,.12);border:1px solid rgba(255,196,80,.5);color:#ffe2a6;font-size:14px}
+.dev-note[hidden]{display:none}
+.dev-diff{display:flex;flex-direction:column;gap:6px}
+.dev-diff input{width:100%}
+.dev-hint{margin:0;color:var(--dim);font-size:13.5px}
+.dev-pick{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:12px;border:1px solid var(--acc);background:rgba(24,214,192,.06)}
+.dev-pick[hidden]{display:none}
+#devList{display:flex;flex-direction:column;gap:6px}
+#devList button{text-align:left}
+#devCancel{align-self:flex-end}
+.dev-err{margin:0;color:#ff9b9b;font-size:14px}
+.dev-err:empty{display:none}
+.dev-btns{display:flex;justify-content:flex-end}
+@media(max-width:900px){.h-top .devBtn span{display:none}.h-top .devBtn{padding:0 12px}}
+/* home screen */
+#menu{display:none;position:fixed;inset:0;z-index:8;flex-direction:column;
+  background:radial-gradient(90% 80% at 75% 45%,#2b3d4d 0%,#151b21 55%,#0b0d10 100%)}
+body.menu #menu{display:flex}
+body.menu #hud,body.menu #ctrl,body.menu #profWrap,body.menu #panelBtn,body.menu #panel,body.menu #mapsBtn,body.menu #wkt{display:none}
+.h-top{display:flex;align-items:center;gap:18px;padding:12px clamp(16px,3vw,32px);flex:none;border-bottom:1px solid var(--line)}
+.brand{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;font:700 28px/1 'Barlow Condensed',sans-serif;letter-spacing:1.5px;text-transform:uppercase;min-height:44px}
+.brand svg{width:32px;height:32px;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.brand svg circle{stroke:var(--line);fill:rgba(255,255,255,.04)}
+.brand svg path{stroke:var(--acc)}
+.brand:focus-visible{outline:2px solid var(--acc);outline-offset:4px;border-radius:6px}
+.tabs{display:flex;gap:4px;margin:0 auto}
+.tabs button{all:unset;cursor:pointer;display:flex;align-items:center;gap:8px;padding:0 16px;min-height:44px;border-radius:10px;color:var(--dim);font:700 18px 'Barlow Condensed',sans-serif;letter-spacing:.4px}
+.tabs svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabs button:hover{color:var(--ink);background:rgba(255,255,255,.06)}
+.tabs button[aria-current=page]{color:var(--ink);background:rgba(24,214,192,.16);box-shadow:inset 0 -2px 0 var(--acc)}
+.tabs button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.profileBtn{display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 14px 6px 8px;border-radius:999px;text-align:left}
+.profileBtn[aria-current=page]{border-color:var(--acc)}
+.profileBtn svg{width:32px;height:32px;padding:6px;border-radius:50%;background:rgba(24,214,192,.18);fill:none;stroke:var(--acc);stroke-width:2}
+.profileBtn span{display:flex;flex-direction:column;line-height:1.15}
+.profileBtn b{font:700 17px 'Barlow Condensed',sans-serif}
+.profileBtn small{font-size:12.5px;color:var(--dim);font-variant-numeric:tabular-nums}
+.pages{flex:1;min-height:0;overflow:auto}
+.page{min-height:100%;padding:28px clamp(16px,3vw,40px) 40px;max-width:1280px;margin:0 auto}
+.page[hidden]{display:none}
+.page h1{font:700 clamp(34px,4vw,48px)/1.02 'Barlow Condensed',sans-serif;margin:0 0 6px;text-wrap:balance;outline:none}
+.page-head{margin-bottom:24px;display:flex;flex-direction:column;gap:4px}
+.page-head p,.sub{color:var(--dim);margin:0;max-width:64ch}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px}
+.startBtn{min-height:52px;padding:0 28px;border-radius:12px;background:var(--acc);border-color:var(--acc);color:#03201c;font:700 21px 'Barlow Condensed',sans-serif;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap}
+.startBtn{flex:none}
+.startBtn:hover{background:#4be3d1}
+.startBtn.wide{width:100%}
+.startBtn.sm{min-height:44px;padding:0 18px;font-size:18px}
+/* home page */
+.page[data-page=home]{max-width:none;padding-top:0;padding-bottom:0;height:100%}
+.home-grid{display:grid;grid-template-columns:minmax(380px,520px) 1fr;gap:24px;height:100%;min-height:520px}
+.home-left{display:flex;flex-direction:column;gap:18px;justify-content:center;padding:28px 0}
+.quick{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:14px 16px;align-items:center;padding:18px;border-radius:16px;background:rgba(24,214,192,.10);border:1px solid rgba(24,214,192,.5)}
+.qs-text{display:flex;flex-direction:column;line-height:1.2}
+.qs-text small{color:var(--dim);font-size:13px}
+.qs-text b{font:700 28px 'Barlow Condensed',sans-serif}
+.qs-text span{color:var(--ink);font-size:15px}
+.qs-text{grid-column:1;grid-row:1}
+.qs-map{width:64px;height:64px;grid-column:2;grid-row:1}
+.qs-map polyline{fill:none;stroke:var(--acc);stroke-width:3;stroke-linejoin:round}
+.qs-map circle{fill:#fff}
+.quick .startBtn{grid-column:1/-1}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{all:unset;cursor:pointer;position:relative;display:flex;flex-direction:column;gap:4px;padding:16px 16px 16px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);min-height:44px}
+.tile:hover{border-color:rgba(24,214,192,.6)}
+.tile:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.tile b{font:700 22px 'Barlow Condensed',sans-serif}
+.tile span{color:var(--dim);font-size:13.5px;padding-right:18px}
+.tile i{position:absolute;right:14px;top:14px;font-style:normal;color:var(--acc);font-size:18px}
+.tiles{grid-template-columns:1fr}
+.tile{flex-direction:row;align-items:center;gap:16px;padding:18px 20px}
+.tile svg{width:44px;height:44px;padding:10px;border-radius:12px;background:rgba(24,214,192,.14);fill:none;stroke:var(--acc);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.t-txt{display:flex;flex-direction:column;gap:2px}
+.tile .t-txt b{font:700 26px/1.05 'Barlow Condensed',sans-serif}
+.tile .t-txt span{color:var(--dim);font-size:14px}
+.tile i{position:static;margin-left:auto;font-size:22px}
+/* races */
+.race-list{display:flex;flex-direction:column;gap:10px;max-width:900px}
+.rl-day{font:700 18px 'Barlow Condensed',sans-serif;letter-spacing:.6px;text-transform:uppercase;color:var(--dim);margin:14px 0 2px}
+.rl-day:first-child{margin-top:0}
+.race{display:grid;grid-template-columns:110px 56px 1fr auto;gap:16px;align-items:center;padding:14px 18px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.race.open{border-color:var(--acc);background:rgba(24,214,192,.08)}
+.race .mc-map{width:56px;height:56px}
+.r-time{display:flex;flex-direction:column;line-height:1.15}
+.r-time b{font:700 26px 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums}
+.r-time span{font-size:13px;color:var(--dim)}
+.race.open .r-time span{color:var(--acc);font-weight:600}
+.r-main h3{font:700 22px/1.1 'Barlow Condensed',sans-serif;margin:0}
+.r-main p{margin:2px 0 0;color:var(--dim);font-size:14px}
+.r-main .r-stats{color:var(--ink);font-variant-numeric:tabular-nums}
+.r-lock{font-size:13px;color:var(--dim);text-align:right;max-width:12ch}
+@media(max-width:700px){.race{grid-template-columns:auto 1fr;gap:8px 14px}.race .mc-map{display:none}.r-main{grid-column:1/-1;grid-row:2}.race .startBtn,.r-lock{grid-column:2;grid-row:1;justify-self:end}}
+/* stage (3D garage) */
+.stage{position:relative;min-height:360px}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:pan-y;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+body.no3d .stage canvas,body.no3d .h-hint{display:none}
+.h-cap{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);text-align:center;display:flex;flex-direction:column;pointer-events:none;width:max-content;max-width:90%}
+.h-cap b{font:700 22px 'Barlow Condensed',sans-serif}
+.h-cap span{color:var(--dim);font-size:14px}
+.h-hint{position:absolute;right:16px;top:12px;font-size:13px;color:var(--dim);pointer-events:none}
+/* course cards (ride / races) */
+.ccard{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.cc-top{display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center}
+.mc-map{width:64px;height:64px;border-radius:10px;background:rgba(0,0,0,.25)}
+.mc-map polyline{fill:none;stroke:#e9ecef;stroke-width:2.6;stroke-linejoin:round}
+.mc-map circle{fill:var(--acc)}
+.mc-text{display:flex;flex-direction:column;gap:2px}
+.mc-name{font:700 26px/1.05 'Barlow Condensed',sans-serif;margin:0}
+.mc-blurb{color:var(--dim);font-size:14px;margin:0}
+.mc-prof{width:100%;height:46px}
+.mc-prof polygon{fill:var(--acc);opacity:.85}
+.mc-climbs rect{fill:rgba(255,255,255,.045)}
+.mc-stats{font:600 15px 'Barlow Condensed',sans-serif;letter-spacing:.2px;font-variant-numeric:tabular-nums}
+.cc-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto}
+.cc-foot .mc-stats{flex:1}
+.laps{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.laps b{font:700 24px 'Barlow Condensed',sans-serif;min-width:80px;text-align:center;font-variant-numeric:tabular-nums}
+.laps-tot{color:var(--dim);font-size:14px;font-variant-numeric:tabular-nums}
+.stp{width:44px;min-height:44px;padding:0;font-size:22px;border-radius:50%}
+/* workouts */
+.wk-course{display:flex;align-items:center;gap:10px;margin-top:10px;color:var(--dim);font-size:14px}
+.wk-course select{font:16px Barlow,sans-serif;color:var(--ink);background:#0b0e11;border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:44px}
+.wk{display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.wk-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.wk-h h2{font:700 24px 'Barlow Condensed',sans-serif;margin:0}
+.wk-h small{color:var(--dim);font-variant-numeric:tabular-nums}
+.wk-chart{width:100%;height:44px}
+.wk-b{font-size:14px;color:var(--dim);margin:0}
+/* garage page */
+.page[data-page=garage]{max-width:none;height:100%;padding-top:0;padding-bottom:0}
+.garage-grid{display:grid;grid-template-columns:1fr minmax(340px,440px);gap:28px;height:100%;min-height:560px}
+.stage.big{min-height:420px}
+.garage-side{padding:28px 0;display:flex;flex-direction:column;gap:14px;overflow:auto}
+.bp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 0}
+.bp-stats div{padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.bp-stats dt{font-size:12.5px;color:var(--dim)}
+.bp-stats dd{margin:0;font:700 20px 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums}
+/* profile page */
+.pf{display:flex;flex-direction:column;gap:14px;max-width:420px}
+.pf label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--dim)}
+.pf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pf-flag{font-size:26px;line-height:1;width:34px;text-align:center}
+.pf-ftp{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.pf-ftp b{font:700 16px 'Barlow Condensed',sans-serif;letter-spacing:.5px;color:var(--dim)}
+.pf select,.pf input{font:16px Barlow,sans-serif;color:var(--ink);background:#0b0e11;border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:44px}
+.pf-wkg{margin:0;color:var(--dim)} .pf-wkg b{color:var(--ink);font:700 20px 'Barlow Condensed',sans-serif}
+.credits{margin-top:36px;color:var(--dim);font-size:13px;max-width:60ch}
+.dl-hint{margin:0;color:var(--dim);font-size:13.5px}
+.pf-btns{display:flex;align-items:center;gap:14px}
+#pfSaved{color:#7fd17f;font-weight:600}
+@media(max-width:900px){
+  .h-top{padding:10px 14px;gap:10px;justify-content:space-between}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:9;margin:0;justify-content:space-around;gap:0;padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+    background:rgba(14,17,21,.96);border-top:1px solid var(--line)}
+  .tabs button{flex-direction:column;gap:2px;padding:4px 6px;font-size:13px;min-width:56px;justify-content:center}
+  .tabs button[aria-current=page]{background:none;box-shadow:none;color:var(--acc)}
+  .pages{padding-bottom:72px}
+  .profileBtn small{display:none}
+  .page[data-page=home],.page[data-page=garage]{height:auto}
+  .home-grid,.garage-grid{display:flex;flex-direction:column;height:auto;min-height:0;gap:8px}
+  .stage{height:42vh;min-height:260px;order:-1}
+  .home-left,.garage-side{padding:8px 0 24px}
+  .h-cap b{font-size:19px} .h-cap{bottom:10px}
+  .bp-stats{grid-template-columns:1fr 1fr 1fr}
+}
+@media(prefers-reduced-motion:reduce){.bp-opt{transition:none}}
+.keys{font-size:13px;color:var(--dim)}
+#bikePick{display:flex;flex-direction:column;gap:18px}
+.bp-group{display:flex;flex-direction:column;gap:10px}
+.subHead{font:700 18px 'Barlow Condensed',sans-serif;letter-spacing:.6px;text-transform:uppercase;color:var(--dim);margin:0}
+.bp-opts{display:flex;gap:10px;flex-wrap:wrap}
+.bp-opt{all:unset;cursor:pointer;flex:1;display:flex;flex-direction:column;gap:4px;padding:12px 16px;min-width:150px;min-height:44px;border-radius:12px;
+  background:rgba(255,255,255,.05);border:1px solid var(--line);transition:border-color .15s,background .15s}
+.bp-opt:hover{border-color:var(--acc)}
+.bp-opt:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.bp-opt[aria-pressed=true]{border-color:var(--acc);background:rgba(24,214,192,.14)}
+.bp-opt b{font:700 22px/1 'Barlow Condensed',sans-serif}
+.bp-opt span{font-size:13px;color:var(--dim);max-width:24ch}
+.bp-opt small{font-size:12.5px;color:var(--ink);opacity:.8;font-variant-numeric:tabular-nums}
+.bp-sum{flex-basis:100%;font:600 16px 'Barlow Condensed',sans-serif;color:var(--dim);font-variant-numeric:tabular-nums}
+@media(prefers-reduced-motion:reduce){.bp-opt{transition:none}}
+@media(max-width:700px){
+  #hud{gap:4px 16px;padding:10px 12px;top:10px;left:10px;max-width:calc(100vw - 20px)}
+  .met b{font-size:26px}
+  #panelBtn{top:auto;bottom:112px;right:10px}
+  #mapsBtn{top:auto;bottom:160px;right:10px}
+  #ctrl{left:10px;bottom:112px;max-width:calc(100vw - 150px)}
+  input[type=range]{width:120px}
+  .keys{display:none}
+  #panel{left:10px;right:10px;width:auto;top:10px;bottom:164px}
+  #profWrap{left:10px;right:10px;bottom:10px}
+}
+@media(prefers-reduced-motion:reduce){#panel{transition:none}}
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="view"></div>
+<div id="loading">Loading…</div>
+<section id="menu">
+  <header class="h-top">
+    <button class="brand" data-go="home"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17"/><path d="M6 26l8-7 5 4 7-10 8 9"/></svg><span id="appName"></span></button>
+    <nav class="tabs" aria-label="Sections">
+      <button data-go="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></button>
+      <button data-go="ride"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="17" r="3.5"/><circle cx="18" cy="17" r="3.5"/><path d="M6 17l4-8h6l2 8M10 9l-1.5-3H6m8 3l-2 8"/></svg><span>Ride</span></button>
+      <button data-go="races"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4m0 0h12l-2 4 2 4H5"/></svg><span>Races</span></button>
+      <button data-go="workouts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M5 20v-6m4 6V9m4 11v-8m4 8V5"/></svg><span>Workouts</span></button>
+      <button data-go="garage"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V9l9-5 9 5v12M7 21v-8h10v8"/></svg><span>Garage</span></button>
+    </nav>
+    <button class="devBtn" id="installBtn" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/></svg><span>Install app</span></button>
+    <button class="devBtn" data-devices aria-label="Pair devices"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg><span>Pair</span></button>
+    <button id="profileBtn" class="profileBtn" data-go="profile"></button>
+  </header>
+
+  <main class="pages">
+    <section class="page" data-page="home" hidden>
+      <div class="home-grid">
+        <div class="home-left">
+          <h1 id="hello" tabindex="-1"></h1>
+          <p class="sub">Choose how you want to ride today.</p>
+          <div id="tiles" class="tiles"></div>
+        </div>
+        <div class="stage" id="homeStage"><div class="h-cap"></div><div class="h-hint">Drag to turn</div></div>
+      </div>
+    </section>
+
+    <section class="page" data-page="ride" hidden>
+      <div class="page-head"><h1 tabindex="-1">Free ride</h1><p>Ride any course at your own pace, as many laps as you like. No finish line.</p></div>
+      <div id="rideList" class="card-grid"></div>
+    </section>
+
+    <section class="page" data-page="races" hidden>
+      <div class="page-head"><h1 tabindex="-1">Races</h1><p>Races run on a schedule, one every 30 minutes. Joining opens 10 minutes before the start; you wait on the line and the race starts on the clock.</p></div>
+      <div id="raceList" class="race-list"></div>
+    </section>
+
+    <section class="page" data-page="workouts" hidden>
+      <div class="page-head"><h1 tabindex="-1">Workouts</h1><p>Structured sessions. Power is set for you like ERG mode on a smart trainer; W/S nudges it. <span id="wkFtp"></span></p>
+        <label class="wk-course">Ride it on <select id="wkCourse"></select></label></div>
+      <div id="wkList" class="card-grid"></div>
+    </section>
+
+    <section class="page" data-page="garage" hidden>
+      <div class="garage-grid">
+        <div class="stage big" id="garageStage"><div class="h-cap"></div><div class="h-hint">Drag to turn</div></div>
+        <div class="garage-side"><h1 tabindex="-1">Garage</h1><p class="sub">The bike you pick changes your speed: aero parts are faster on the flat, light parts climb better.</p><div id="bikePick"></div></div>
+      </div>
+    </section>
+
+    <section class="page" data-page="profile" hidden>
+      <div class="page-head"><h1 tabindex="-1">Profile</h1><p>Saved on this computer only.</p></div>
+      <form id="profileForm" class="pf">
+        <label>Name <input name="name" maxlength="40" autocomplete="nickname"></label>
+        <label>Country <select name="country" autocomplete="country"></select></label>
+        <div class="pf-row">
+          <label>Height (cm) <input name="cm" type="number" min="130" max="215" step="1" required inputmode="numeric"></label>
+          <label>Weight (kg) <input name="kg" type="number" min="35" max="150" step="0.5" required inputmode="decimal"></label>
+        </div>
+        <div class="pf-ftp"><b>FTP</b><span id="pfFtp"></span></div>
+        <p class="dl-hint">Height and weight set your air drag and how hard the climbs are. You don't enter FTP: the app works it out from your best 20-minute efforts and uses it for workouts.</p>
+        <div class="pf-btns"><button class="startBtn sm">Save</button><span id="pfSaved" role="status"></span></div>
+      </form>
+      <p class="credits">Credits: textures and sky from Poly Haven (CC0). Rider character from Adobe Mixamo. 3D engine: three.js (MIT).</p>
+    </section>
+  </main>
+</section>
+
+<div id="hud" class="glass">
+  <div class="met pow"><b><span id="hPow">0</span><small>W</small></b><span>Power</span></div>
+  <div class="met"><b><span id="hWkg">0</span><small>W/kg</small></b><span>Per kg</span></div>
+  <div class="met" id="cadMet" hidden><b><span id="hCad">0</span><small>rpm</small></b><span>Cadence</span></div>
+  <div class="met" id="hrMet" hidden><b><span id="hHr">0</span><small>bpm</small></b><span>Heart rate</span></div>
+  <div class="met"><b><span id="hSpd">0</span><small>km/h</small></b><span>Speed</span></div>
+  <div class="met"><b><span id="hGrd">0</span><small>%</small></b><span>Grade</span></div>
+  <div class="met"><b><span id="hDst">0</span><small>km</small></b><span id="dstLabel">Distance</span></div>
+  <div class="met"><b><span id="hEle">0</span><small>m</small></b><span>Elevation</span></div>
+  <div class="met" id="lapMet" hidden><b><span id="hLap">1/1</span></b><span>Lap</span></div>
+  <div id="climbNow"></div>
+</div>
+
+<div id="wkt" class="glass" hidden>
+  <div class="wk-top"><span id="wkName"></span><span id="wkBias"></span></div>
+  <div class="wk-now"><b id="wkNow"></b><span id="wkLeft"></span></div>
+  <canvas id="wkChart"></canvas>
+  <div id="wkNext"></div>
+</div>
+
+<div id="ctrl" class="glass">
+  <label>Power <input id="pow" type="range" min="0" max="600" step="5" value="200"></label>
+  <button class="devBtn" data-devices><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg><span>Trainer</span></button>
+  <button id="camBtn">Camera: Chase</button>
+  <button id="pauseBtn">Pause</button>
+  <button id="qualBtn">Quality: Auto</button>
+  <span id="fps" class="keys"></span>
+  <span class="keys">W/S power · C camera · Space pause</span>
+</div>
+
+<button id="mapsBtn">Maps</button>
+
+<dialog id="devDlg">
+  <form method="dialog" class="dev">
+    <h2>Pair devices</h2>
+    <p class="dev-note" id="devNote" hidden></p>
+    <div class="dev-row"><div><b>Smart trainer or power meter</b><span id="devTr">Not connected</span></div><button type="button" id="devTrBtn">Pair</button></div>
+    <div class="dev-row"><div><b>Heart rate</b><span id="devHr">Not connected</span></div><button type="button" id="devHrBtn">Pair</button></div>
+    <label class="dev-diff"><span><b>Trainer difficulty</b> <span id="devDiffV">50%</span></span><input type="range" id="devDiff" min="0" max="100" step="5"></label>
+    <p class="dev-hint">How much of the real gradient you feel on climbs. 50% is the usual setting (Zwift's default). In workouts the trainer holds the target watts instead (ERG).</p>
+    <div class="dev-pick" id="devPick" hidden><b>Choose your device</b><span class="dev-hint">Searching… pedal to wake the trainer.</span><div id="devList"></div><button type="button" id="devCancel">Cancel</button></div>
+    <p class="dev-err" id="devErr" role="alert"></p>
+    <p class="dev-hint">Wake the trainer by pedaling, and close Zwift or any phone app that might already be connected to it.</p>
+    <div class="dev-btns"><button value="close" class="startBtn sm">Done</button></div>
+  </form>
+</dialog>
+<button id="panelBtn">Textures</button>
+<aside id="panel" class="glass">
+  <h2>Texture slots</h2>
+  <p>Drop a Poly Haven texture's files onto a slot (Color, nor_gl, and arm or rough). Set the tile size to the asset's real-world size in meters. Anything you don't add stays as a placeholder.</p>
+  <div id="slots"></div>
+</aside>
+
+<div id="profWrap" class="glass">
+  <div class="row"><span><span id="mapName"></span> · course profile, click to jump</span><span id="climb"></span></div>
+  <canvas id="profile"></canvas>
+</div>
+
+<script>
+{
+  const box = document.getElementById('loading');
+  const fail = (msg) => { if (!box) return; box.style.cssText += ';font:16px/1.5 Barlow,sans-serif;padding:24px;text-align:left';
+    box.innerHTML = '<div style="max-width:560px"><b style="font:700 24px Barlow Condensed">Can’t start the 3D view</b><p>' + msg +
+      '</p><p style="color:#b7bcc2">Browser: ' + navigator.userAgent.replace(/</g, '&lt;') + '</p></div>'; };
+  window.__fail = fail;
+  const c = document.createElement('canvas');
+  const gl2 = c.getContext('webgl2');
+  if (!gl2) fail(c.getContext('webgl') ? 'This browser has WebGL 1 but not WebGL 2, which Three.js needs. Try current Chrome, Edge, Firefox or Safari 15+.'
+    : 'WebGL is turned off or unavailable. In Chrome open chrome://settings/system and turn on "Use graphics acceleration", then restart the browser.');
+  else if (!(HTMLScriptElement.supports && HTMLScriptElement.supports('importmap'))) fail('This browser is too old for import maps. Update it (Safari 16.4+, Chrome 89+).');
+  addEventListener('error', (e) => fail('Script error: ' + (e.message || e.filename)));
+  addEventListener('unhandledrejection', (e) => fail('Error: ' + (e.reason && e.reason.message || e.reason)));
+  setTimeout(() => { if (document.getElementById('loading') && box.textContent === 'Loading…') fail('Three.js didn’t load after 20 s. Check your connection, or whether something is blocking cdn.jsdelivr.net (ad blocker, school/work network).'); }, 20000);
+}
+</script>
+<script type="module" src="js/main.js"></script>
+<div id="finishBanner" class="glass" hidden><b></b><span></span></div>
+<div id="qualHint" class="glass" hidden>Your computer is struggling at this quality. <button>Switch to Low</button></div>
+<script>
+{
+  // installable app: offline cache + "Install app" button where the browser offers it
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  let deferred = null; const btn = document.getElementById('installBtn');
+  addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; btn.hidden = false; });
+  btn.onclick = async () => { if (!deferred) return; deferred.prompt(); await deferred.userChoice.catch(() => {}); deferred = null; btn.hidden = true; };
+  addEventListener('appinstalled', () => { btn.hidden = true; });
+}
+</script>
+</body>
+</html>
