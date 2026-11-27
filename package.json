@@ -1,0 +1,42 @@
+{
+  "name": "rydehaven",
+  "productName": "Rydehaven",
+  "version": "0.1.0",
+  "description": "Indoor cycling game: ride, race and train on your smart trainer.",
+  "author": "Rydehaven",
+  "main": "electron/main.cjs",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "mac": "electron-builder --mac --universal --publish never",
+    "win": "electron-builder --win --x64 --publish never"
+  },
+  "dependencies": {
+    "three": "0.160.0"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.rydehaven.app",
+    "productName": "Rydehaven",
+    "asar": false,
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["electron/**", "app/**", "package.json"],
+    "mac": {
+      "target": ["dmg"],
+      "category": "public.app-category.healthcare-fitness",
+      "icon": "build/icon.png",
+      "identity": "-",
+      "artifactName": "Rydehaven-mac.${ext}",
+      "extendInfo": {
+        "NSBluetoothAlwaysUsageDescription": "Rydehaven connects to your smart trainer, power meter and heart-rate strap over Bluetooth.",
+        "NSBluetoothPeripheralUsageDescription": "Rydehaven connects to your smart trainer, power meter and heart-rate strap over Bluetooth."
+      }
+    },
+    "dmg": { "title": "Rydehaven" },
+    "win": { "target": ["nsis"], "icon": "build/icon.png", "artifactName": "Rydehaven-windows.${ext}" },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true, "shortcutName": "Rydehaven", "artifactName": "Rydehaven-windows.${ext}" }
+  }
+}

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Cycle Helmet
+* source:	https://sketchfab.com/3d-models/cycle-helmet-f46c25c369f547a8aac0a2907fd12ca2
+* author:	markchester (https://sketchfab.com/markchester)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Cycle Helmet" (https://sketchfab.com/3d-models/cycle-helmet-f46c25c369f547a8aac0a2907fd12ca2) by markchester (https://sketchfab.com/markchester) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

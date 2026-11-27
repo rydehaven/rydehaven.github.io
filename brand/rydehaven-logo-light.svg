@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1140" height="400" viewBox="0 0 1140 400">
+<g transform="translate(60,80) scale(2)"><defs><clipPath id="c"><circle cx="60" cy="60" r="46"/></clipPath></defs>
+<circle cx="60" cy="60" r="46" fill="#EAF7F5"/>
+<g clip-path="url(#c)"><circle cx="60" cy="60" r="17" fill="#FF8A3D"/>
+<path d="M0 74 Q30 54 60 70 T120 62 V120 H0 Z" fill="#2EC4B6"/><path d="M0 92 Q40 72 80 86 T120 80 V120 H0 Z" fill="#0E7C74"/><path d="M50 122 C54 104 72 98 64 82" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/></g>
+<circle cx="60" cy="60" r="51" fill="none" stroke="#0F1B2D" stroke-width="8"/></g>
+<text x="340" y="245" font-family="'Space Grotesk', Inter, Arial, sans-serif" font-size="128" letter-spacing="-2" fill="#0F1B2D" font-weight="700">Ryde<tspan font-weight="400" fill="#0E7C74">haven</tspan></text></svg>

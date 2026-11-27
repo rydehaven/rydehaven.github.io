@@ -1,0 +1,54 @@
+# Builds the Rydehaven installers on GitHub's computers and publishes them as a Release.
+# It runs by itself whenever the game changes, or: Actions tab → "Build Rydehaven" → Run workflow. When it's done, the installers are under Releases.
+# The website's Download buttons always point at the newest Release.
+name: Build Rydehaven
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['app/**', 'electron/**', 'build/**', 'package.json']
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            script: mac
+            file: dist/Rydehaven-mac.dmg
+          - os: windows-latest
+            script: win
+            file: dist/Rydehaven-windows.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: npm run ${{ matrix.script }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.script }}
+          path: ${{ matrix.file }}
+          if-no-files-found: error
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.1.${{ github.run_number }}
+          name: Rydehaven 0.1.${{ github.run_number }}
+          make_latest: 'true'
+          files: |
+            out/Rydehaven-mac.dmg
+            out/Rydehaven-windows.exe

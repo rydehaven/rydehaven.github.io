@@ -1,7 +1,10 @@
-# Rydehaven (web app)
+# Rydehaven
 
-Upload everything in this folder to GitHub Pages (or Netlify) and Rydehaven is online at a public https address.
-People can play in any browser, install it as an app from Chrome or Edge ("Install app" button), and pair a smart
-trainer over Bluetooth in Chrome or Edge. Safari and iPhone/iPad can play but can't connect trainers (Apple blocks it).
+- `index.html`, `brand/`, `icons/`: the website at https://rydehaven.github.io (GitHub Pages, branch `main`, root folder). Its Download buttons point at the newest Release.
+- `app/`: the game.
+- `electron/` + `package.json`: turn the game into the Mac and Windows app.
+- `.github/workflows/build.yml`: GitHub builds the installers and puts them under Releases. It runs by itself when the game changes, or from Actions → Build Rydehaven → Run workflow.
+- `build/icon.png`: the app icon.
+- `FIREBASE-SETUP.md` and `firebase-rules.json`: ride chat.
 
-When you upload changes, open sw.js and change VERSION (rydehaven-v1 → rydehaven-v2) so installed copies update.
+Questions: rydehaven.contact@gmail.com
