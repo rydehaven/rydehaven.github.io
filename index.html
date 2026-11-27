@@ -149,6 +149,20 @@ details[open] summary::after{content:'–'}
 details p{margin:0 0 16px;color:var(--dim)}
 footer{border-top:1px solid var(--line);padding:30px 0 calc(40px + env(safe-area-inset-bottom));color:var(--dim);font-size:14px}
 footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+
+/* first-launch help */
+.help-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.help{padding:24px}
+.help h3{font-size:24px;text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.help h3 span{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--edge);color:var(--cy);font-size:19px}
+.help ol{margin:0;padding-left:20px;display:grid;gap:10px;color:var(--dim);font-size:15.5px}
+.help ol b{color:var(--ink)}
+.cmd{display:flex;align-items:center;gap:8px;margin-top:8px;padding:10px 12px;background:rgba(0,0,0,.45);border:1px solid var(--line)}
+.cmd code{flex:1;font:14px ui-monospace,Menlo,monospace;color:#7dffb0;overflow-wrap:anywhere}
+.copy{flex:none;min-height:36px;padding:0 14px;border:1px solid var(--edge);background:rgba(95,246,255,.08);color:var(--cy);font:700 14px Rajdhani,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.help-win{margin:18px 0 0;color:var(--dim);font-size:15.5px}.help-win b{color:var(--ink)}
+details p a,.help-win a,.steps a{color:var(--cy)}
+@media(max-width:980px){.help-grid{grid-template-columns:1fr}}
 @media(max-width:980px){
   .links{display:none}
   nav.top .btn{margin-left:auto}
@@ -315,13 +329,42 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
         <button role="tab" data-p="mac">Mac</button>
         <button role="tab" data-p="win">Windows</button>
       </div>
-      <ol class="steps" data-p="mac"><li><span>Open <b>Rydehaven-mac.dmg</b> from your Downloads.</span></li><li><span>Drag Rydehaven into the Applications folder.</span></li><li><span>Open it from Applications. If your Mac says it can't check the app, open System Settings → Privacy &amp; Security, scroll down and click <b>Open Anyway</b>. You only do this once.</span></li><li><span>When Rydehaven asks to use Bluetooth, click Allow, then pair your trainer.</span></li></ol>
+      <ol class="steps" data-p="mac"><li><span>Open <b>Rydehaven-mac.dmg</b> from your Downloads.</span></li><li><span>Drag Rydehaven into the Applications folder.</span></li><li><span>Open it from Applications. If your Mac says it can't be opened, see <a href="#open-help">Mac won't open it?</a> below. You only do this once.</span></li><li><span>When Rydehaven asks to use Bluetooth, click Allow, then pair your trainer.</span></li></ol>
       <ol class="steps" data-p="win" hidden><li><span>Open <b>Rydehaven-windows.exe</b> from your Downloads.</span></li><li><span>If Windows shows "Windows protected your PC", click <b>More info</b>, then <b>Run anyway</b>.</span></li><li><span>Follow the installer. Rydehaven goes in your Start menu and on your desktop.</span></li><li><span>Open it, click Pair and choose your trainer.</span></li></ol>
     </div>
   </div>
 </section>
 
-<section class="band" id="faq">
+<section class="band" id="open-help">
+  <div class="wrap">
+    <div class="kicker">First launch</div>
+    <h2>Mac won't open it?</h2>
+    <p class="sub">The first time you open Rydehaven, your Mac may say it "cannot be opened because the developer cannot be verified". That's normal for new apps. You only need to do this once.</p>
+    <div class="help-grid">
+      <div class="help panel cut">
+        <h3><span>1</span> Open Anyway</h3>
+        <ol>
+          <li>Make sure Rydehaven is in your <b>Applications</b> folder, not still in the download window. If the download window is open, eject it.</li>
+          <li>Open Rydehaven from Applications once, and click <b>Done</b> on the warning.</li>
+          <li>Open <b>System Settings › Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b>.</li>
+          <li>Open Rydehaven again and click <b>Open</b>.</li>
+        </ol>
+      </div>
+      <div class="help panel cut">
+        <h3><span>2</span> If that doesn't work</h3>
+        <ol>
+          <li>Open <b>Terminal</b>: press <b>Command + Space</b>, type Terminal, press <b>Return</b>.</li>
+          <li>Copy this line, paste it into Terminal and press <b>Return</b>:
+            <div class="cmd"><code id="qCmd">xattr -dr com.apple.quarantine /Applications/Rydehaven.app</code><button type="button" class="copy" data-copy="qCmd">Copy</button></div></li>
+          <li>When it goes to a new line with no message, open Rydehaven from <b>Applications</b>.</li>
+        </ol>
+      </div>
+    </div>
+    <p class="help-win"><b>On Windows?</b> If you see "Windows protected your PC", click <b>More info</b>, then <b>Run anyway</b>. Still stuck? Email <a href="mailto:rydehaven.contact@gmail.com">rydehaven.contact@gmail.com</a>.</p>
+  </div>
+</section>
+
+<section class="band alt" id="faq">
   <div class="wrap">
     <div class="kicker">FAQ</div>
     <h2>Questions</h2>
@@ -330,7 +373,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
       <details><summary>Which trainers work?</summary><p>Most Bluetooth smart trainers from recent years that use the standard fitness machine protocol (FTMS), including Wahoo KICKR, Tacx, Elite and Saris. Bluetooth power meters work for power and cadence. ANT+ isn't supported yet.</p></details>
       <details><summary>Can I race other riders?</summary><p>Yes. Join a race and you line up with everyone else who joined, then race them to the line.</p></details>
       <details><summary>Can I play on my iPhone or iPad?</summary><p>Not yet. Phones and tablets need their own Rydehaven app to connect to a trainer. iPhone and Android apps are coming.</p></details>
-      <details><summary>Why does my computer warn me when I open it?</summary><p>Rydehaven isn't signed with an Apple or Microsoft developer certificate yet, so your computer asks you to confirm the first time. The install steps above show the one-time click to get past it.</p></details>
+      <details><summary>Why does my computer warn me when I open it?</summary><p>Your computer double-checks new apps the first time you open them. Follow <a href="#open-help">Mac won't open it?</a> above; you only do it once.</p></details>
       <details><summary>The trainer won't show up when I pair</summary><p>Pedal to wake it, and close any other training or phone app that's already connected, because a trainer only talks to one app at a time. Then click Pair again.</p></details>
       <details><summary>Can I host a race?</summary><p>Yes. Email <a href="mailto:rydehaven.contact@gmail.com?subject=Rydehaven%20race%20idea">rydehaven.contact@gmail.com</a> with the course, how many laps, the day and time, and who it's for.</p></details>
       <details><summary>How do I get in touch?</summary><p>Email <a href="mailto:rydehaven.contact@gmail.com">rydehaven.contact@gmail.com</a> with questions, feedback or anything that isn't working.</p></details>
@@ -360,6 +403,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
   else if (isWin) { hero.querySelector('span').textContent = 'Download for Windows'; hero.href = document.getElementById('dlWin').href; }
   else { hero.querySelector('span').textContent = 'Download for Mac'; hero.href = document.getElementById('dlMac').href; }
   if (isWin) { const m = document.getElementById('dlMac'), w = document.getElementById('dlWin'); m.classList.remove('primary'); w.classList.add('primary'); m.parentNode.insertBefore(w, m); w.style.marginTop = '0'; m.style.width = '100%'; m.style.marginTop = '10px'; }
+  document.querySelectorAll('[data-copy]').forEach((b) => (b.onclick = async () => {
+    const t = document.getElementById(b.dataset.copy).textContent;
+    try { await navigator.clipboard.writeText(t); } catch (e) { const r = document.createRange(); r.selectNodeContents(document.getElementById(b.dataset.copy)); getSelection().removeAllRanges(); getSelection().addRange(r); document.execCommand('copy'); }
+    b.textContent = 'Copied'; setTimeout(() => (b.textContent = 'Copy'), 2000);
+  }));
   document.querySelectorAll('#dlMac,#dlWin,#heroDl').forEach((a) => a.addEventListener('click', () => { if (a.getAttribute('href').startsWith('http')) setTimeout(() => { note.textContent = 'Downloading… then follow the install steps.'; document.getElementById('download').scrollIntoView(); }, 300); }));
 }
 </script>
