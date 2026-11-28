@@ -1,7 +1,7 @@
 // thumbs.js — event artwork for the Races page: a futuristic poster for each route, painted on a canvas from the
 // route itself (its real elevation profile and map shape) over a stylised landscape for its world.
 // No image files: every thumbnail is drawn here, once per route, and cached as a data URL.
-import { fbm } from './noise.js?v=75';
+import { fbm } from './noise.js?v=76';
 
 const THEMES = {
   cretes: { sky: ['#0a0f2c', '#2b1055', '#d53a9d'], sun: ['#ffe36e', '#ff4f8b'], hills: ['#3a1c71', '#1c2b6b', '#0c1b3a'], grid: '#ff4fd8', line: '#5ff6ff', kind: 'valley' },

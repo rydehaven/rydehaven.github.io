@@ -1,8 +1,8 @@
 // bike.js — Three.js wrapper for the generated road bike: meshes, paint + RYDEHAVEN decal, wheel spin and cadence.
 // Geometry is built once per frame/wheel combination and shared (the race field reuses it); materials are per bike.
 import * as THREE from 'three';
-import { bikeParts, BIKE, decalSpot } from './bikegen.js?v=75';
-import { decalColor } from './kits.js?v=75';
+import { bikeParts, BIKE, decalSpot } from './bikegen.js?v=76';
+import { decalColor } from './kits.js?v=76';
 
 const MAT = {
   carbon: { color: 0x0b0b0d, roughness: 0.32, metalness: 0.1 },

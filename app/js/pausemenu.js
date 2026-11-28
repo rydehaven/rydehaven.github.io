@@ -1,10 +1,10 @@
 // pausemenu.js — the in-ride menu: Resume, Garage, Devices, Settings, Chat and Leave ride.
 // In a free ride the ride stops while it's open. In a race it never stops the race: you just stop pedalling.
 // Chat also pops up small messages on the ride screen while the menu is closed.
-import { BIKE_OPTIONS } from './bikegen.js?v=75';
-import { KITS, PAINTS, isUnlocked, getKit, setKit } from './kits.js?v=75';
-import { getBikeChoice, setBikeChoice, getProfile, flag } from './settings.js?v=75';
-import { openChat, chatEnabled, chatMute, chatInPreview, CHAT_MAX } from './chat.js?v=75';
+import { BIKE_OPTIONS } from './bikegen.js?v=76';
+import { KITS, PAINTS, isUnlocked, getKit, setKit } from './kits.js?v=76';
+import { getBikeChoice, setBikeChoice, getProfile, flag } from './settings.js?v=76';
+import { openChat, chatEnabled, chatMute, chatInPreview, CHAT_MAX } from './chat.js?v=76';
 
 const pmEsc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const pmHex = (n) => '#' + n.toString(16).padStart(6, '0');
@@ -20,7 +20,7 @@ export function makePauseMenu(H) {
       <div class="pm-title"><small>${H.race ? 'Race menu' : 'Paused'}</small><b>${pmEsc(H.raceName || 'Ride')}</b>${H.race ? '<span class="pm-live">The race keeps going</span>' : ''}</div>
       <button class="pm-resume startBtn" data-act="resume">${H.race ? 'Back to the race' : 'Resume'}</button>
       <button data-tab="garage">Garage</button><button data-tab="devices">Devices</button>
-      <button data-tab="settings">Settings</button><button data-tab="chat">Chat<i class="pm-dot" hidden></i></button>
+      <button data-tab="settings">Settings</button><button data-tab="remote">Remote<i class="pm-dot pm-link" hidden></i></button><button data-tab="chat">Chat<i class="pm-dot" hidden></i></button>
       <button class="pm-leave" data-act="leave">${H.race ? 'Leave race' : 'End ride'}</button>
     </nav>
     <section class="pm-body"></section></div>`;
@@ -41,7 +41,7 @@ export function makePauseMenu(H) {
     first = false; updateDot();
     if (open && tab === 'chat') drawChatList();
   } });
-  function updateDot() { root.querySelector('.pm-dot').hidden = !unread; const b = document.getElementById('chatBtn'); if (b) b.dataset.unread = unread ? String(Math.min(unread, 9)) : ''; }
+  function updateDot() { root.querySelector('[data-tab=chat] .pm-dot').hidden = !unread; const b = document.getElementById('chatBtn'); if (b) b.dataset.unread = unread ? String(Math.min(unread, 9)) : ''; }
   function toast(m) {
     if (open) return;
     const t = document.createElement('div'); t.className = 'ct';
@@ -54,7 +54,7 @@ export function makePauseMenu(H) {
   function show(name) {
     tab = name; confirmLeave = false;
     root.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-current', String(b.dataset.tab === name)));
-    if (name === 'garage') drawGarage(); else if (name === 'devices') drawDevices(); else if (name === 'settings') drawSettings(); else drawChat();
+    if (name === 'garage') drawGarage(); else if (name === 'devices') drawDevices(); else if (name === 'settings') drawSettings(); else if (name === 'remote') drawRemote(); else drawChat();
   }
   function drawGarage() {
     const c = getBikeChoice(), kit = getKit(), lock = H.race;
@@ -88,6 +88,23 @@ export function makePauseMenu(H) {
     body.querySelectorAll('[data-q]').forEach((b) => (b.onclick = () => { H.quality.set(b.dataset.q); drawSettings(); }));
     body.querySelector('#pmSnd').onchange = (e) => H.sound.set({ muted: !e.target.checked });
     body.querySelector('#pmSfx').oninput = (e) => H.sound.set({ sfx: e.target.value / 100 });
+  }
+  function drawRemote() {
+    const R = H.remote && H.remote();
+    const st = !R ? 'off' : R.state, code = R ? R.code : '';
+    const msg = st === 'off' ? 'Rydehaven Remote needs ride chat to be switched on.'
+      : st === 'preview' ? 'Rydehaven Remote can’t connect inside this preview window. Open Rydehaven itself.'
+      : st === 'error' ? 'Couldn’t reach the Remote service. Check your internet connection; it keeps trying.'
+      : st === 'starting' ? 'Getting your code ready…'
+      : R.linked ? '<b class="pm-ok">Your phone is linked.</b> It’s showing your live stats, and it can change the camera and send emotes.'
+      : 'Waiting for your phone…';
+    body.innerHTML = `<h2>Remote <small>your phone as a second screen</small></h2>
+      <p class="pm-note">On your phone, open <b>rydehaven.github.io/remote</b> and enter this code:</p>
+      <div class="pm-code" aria-label="Remote code">${st === 'off' ? '------' : code.split('').map((c) => `<span>${c}</span>`).join('')}</div>
+      <p class="pm-note">${msg}</p>
+      <p class="pm-note">Your phone shows power, speed, heart rate, the map, your race and KOMs, and can change the camera and send emotes.</p>
+      ${st !== 'off' ? '<button class="pm-chip" id="pmNewCode">Get a new code</button><p class="pm-note">A new code unlinks any phone using the old one.</p>' : ''}`;
+    const b = body.querySelector('#pmNewCode'); if (b) b.onclick = () => { H.remote().newCode(); drawRemote(); };
   }
   function drawChat() {
     unread = 0; updateDot();
@@ -143,5 +160,7 @@ export function makePauseMenu(H) {
     toggle(startTab) { setOpen(!open || (startTab && tab !== startTab), startTab); },
     close() { setOpen(false); },
     refreshSettings() { if (open && tab === 'settings') drawSettings(); },
+    refreshRemote() { const R = H.remote && H.remote(); root.querySelector('.pm-link').hidden = !(R && R.linked); if (open && tab === 'remote') drawRemote(); },
+    notice(text) { if (open) return; const t = document.createElement('div'); t.className = 'ct'; t.innerHTML = `<b>Remote</b> ${pmEsc(text)}`; toasts.appendChild(t); setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 400); }, 5000); },
   };
 }

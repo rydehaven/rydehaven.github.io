@@ -1,6 +1,6 @@
 // maps/alpine.js — MOUNTAIN MAP: valley start -> hairpin climb up the south face -> balcony road
 // along the contour near the top -> faster hairpin descent -> valley road home.
-import { hash, fbm, ridged, smooth, gauss } from '../js/noise.js?v=75';
+import { hash, fbm, ridged, smooth, gauss } from '../js/noise.js?v=76';
 
 export const ALPINE = (() => {
   const world = {

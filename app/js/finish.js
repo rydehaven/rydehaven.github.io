@@ -1,7 +1,7 @@
 // finish.js — race furniture: finish gantry with banner, painted finish line, crowd barriers
 // along the final straight, and the "flamme rouge" (red kite) 1 km from the line.
 import * as THREE from 'three';
-import { sampleRoute } from './world.js?v=75';
+import { sampleRoute } from './world.js?v=76';
 
 function bannerTexture(text, bg, fg) {
   const c = document.createElement('canvas'); c.width = 1024; c.height = 128;

@@ -1,5 +1,5 @@
-import { FREEWHEEL_SR, FREEWHEEL_LOOPS, FREEWHEEL_PCM } from './freewheel.js?v=75';
-import { PEDAL_SR, PEDAL_PCM } from './pedal.js?v=75';
+import { FREEWHEEL_SR, FREEWHEEL_LOOPS, FREEWHEEL_PCM } from './freewheel.js?v=76';
+import { PEDAL_SR, PEDAL_PCM } from './pedal.js?v=76';
 // audio.js — sound for Rydehaven, made live with the Web Audio API. The freewheel uses real recorded clicks (see Credits); everything else is synthesised.
 //   Home screen: "Morning Chords", an original track (piano chords and a soft beat), played from audio/home.mp3.
 //   In a ride: a slight recorded pedalling sound, the recorded freewheel when you coast, and chimes for KOMs,

@@ -1,5 +1,5 @@
 // devices.js — the "Pair devices" window, shared by the home screen and the ride.
-import { trainer, connectTrainer, connectHr, disconnectTrainer, BT_SUPPORT, btHelp } from './trainer.js?v=75';
+import { trainer, connectTrainer, connectHr, disconnectTrainer, BT_SUPPORT, btHelp } from './trainer.js?v=76';
 
 const el = (id) => document.getElementById(id);
 const DIFF_KEY = 'rydehaven.difficulty';

@@ -152,7 +152,7 @@ footer{border-top:1px solid var(--line);padding:30px 0 calc(40px + env(safe-area
 footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
 
 
-/* companion */
+/* Rydehaven Remote */
 .comp{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:40px;align-items:center}
 .comp-list{list-style:none;margin:0 0 26px;padding:0;display:grid;gap:12px}
 .comp-list li{display:grid;gap:2px;padding-left:18px;border-left:2px solid var(--cy)}
@@ -170,6 +170,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 .ph-msg{align-self:flex-start;max-width:85%;padding:6px 10px;background:rgba(95,246,255,.07);border:1px solid rgba(95,246,255,.14);font-size:13px}
 .ph-msg b{display:block;color:var(--cy);font-size:12px}
 .ph-msg.me{align-self:flex-end;background:rgba(46,196,182,.16)}
+.ph-stats{display:flex;gap:14px;margin-top:8px;color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.1em}.ph-stats b{display:block;font:700 22px/1 Rajdhani,sans-serif;color:#fff;letter-spacing:0}
+.ph-map{display:block;width:100%;height:auto;background:rgba(0,0,0,.3)}
+.ph-emo{display:flex;justify-content:space-between;font-size:22px}
 .ph-tabs{display:flex;justify-content:space-around;margin:6px -14px 0;padding:12px 0 16px;border-top:1px solid var(--line);font:700 11px Rajdhani,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
 .ph-tabs .on{color:var(--cy)}
 @media(max-width:980px){.comp{grid-template-columns:1fr}}
@@ -214,7 +217,7 @@ details p a,.help-win a,.steps a{color:var(--cy)}
 <nav class="top" aria-label="Main">
   <div class="wrap">
     <a class="brand" href="./" aria-label="Rydehaven home"><svg class="mark" viewBox="2 2 116 116" aria-hidden="true"><defs><clipPath id="rhc"><circle cx="60" cy="60" r="46"/></clipPath></defs><circle cx="60" cy="60" r="46" fill="#1B2D47"/><g clip-path="url(#rhc)"><circle cx="60" cy="60" r="17" fill="#FF8A3D"/><path d="M0 74 Q30 54 60 70 T120 62 V120 H0 Z" fill="#2EC4B6"/><path d="M0 92 Q40 72 80 86 T120 80 V120 H0 Z" fill="#0E7C74"/><path d="M50 122 C54 104 72 98 64 82" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/></g><circle cx="60" cy="60" r="51" fill="none" stroke="#FFFFFF" stroke-width="8"/></svg><span class="wordmark">Ryde<span>haven</span></span></a>
-    <div class="links"><a href="#features">Features</a><a href="#races">Races</a><a href="#courses">Courses</a><a href="#companion">Companion</a><a href="#devices">Devices</a><a href="#faq">FAQ</a></div>
+    <div class="links"><a href="#features">Features</a><a href="#races">Races</a><a href="#courses">Courses</a><a href="#remote">Remote</a><a href="#devices">Devices</a><a href="#faq">FAQ</a></div>
     <a class="btn primary" href="#download">Download</a>
   </div>
 </nav>
@@ -319,26 +322,31 @@ details p a,.help-win a,.steps a{color:var(--cy)}
   </div>
 </section>
 
-<section class="band alt" id="companion">
+<section class="band alt" id="remote">
   <div class="wrap comp">
     <div>
-      <div class="kicker">Companion</div>
-      <h2>Rydehaven on your phone</h2>
-      <p class="sub">The companion keeps the next race and ride chat in your pocket. It works in your phone's browser, and you can add it to your home screen so it opens like an app.</p>
+      <div class="kicker">Rydehaven Remote</div>
+      <h2>Your ride on your phone</h2>
+      <p class="sub">Link your phone to your ride with a 6-letter code and it becomes a second screen and a remote control. It works in your phone's browser, and you can add it to your home screen so it opens like an app.</p>
       <ul class="comp-list">
-        <li><b>Upcoming races</b><span>See what's next and how long until the start.</span></li>
-        <li><b>Ride chat</b><span>Talk to riders in a race or on any route, the same chat as in the game.</span></li>
-        <li><b>Your rider</b><span>Your name and flag in chat.</span></li>
+        <li><b>Live stats</b><span>Power, speed, heart rate, cadence, distance and grade, updated every second.</span></li>
+        <li><b>Race info</b><span>Race clock, lap and distance to go while you ride.</span></li>
+        <li><b>Map</b><span>See where you are on the route and what's coming on the elevation profile.</span></li>
+        <li><b>KOMs</b><span>Time on the climb, distance to the top and your best.</span></li>
+        <li><b>Camera and emotes</b><span>Switch the camera and pop a 👍 🎉 👋 🔥 💪 🙌 over your rider.</span></li>
+        <li><b>Races and chat</b><span>Upcoming races and the same ride chat as the game.</span></li>
       </ul>
-      <div class="cta"><a class="btn primary" href="companion/">Open the companion</a></div>
+      <div class="cta"><a class="btn primary" href="remote/">Open Rydehaven Remote</a></div>
       <p class="fine">On iPhone: open it in Safari, tap Share, then Add to Home Screen. On Android: open it in Chrome, tap ⋮, then Add to Home screen.</p>
     </div>
     <div class="phone" aria-hidden="true">
-      <div class="ph-top"><span>Next race</span></div>
-      <div class="ph-card"><i>Flagship</i><b>Highcrest Grand Prix</b><small>Road race · 3 laps</small><strong>12 min</strong><em>to the start · joining is open</em><span class="ph-btn">Chat about this race</span></div>
-      <div class="ph-msg"><b>🇬🇧 Maya</b> See you on The Wall 👋</div>
-      <div class="ph-msg me"><b>🇺🇸 You</b> Lining up now</div>
-      <div class="ph-tabs"><span class="on">Races</span><span>Chat</span><span>You</span></div>
+      <div class="ph-top"><span>● Live · Highcrest Circuit</span></div>
+      <div class="ph-card"><b style="font-size:54px;line-height:.9">258</b><small>Watts · 3.5 W/kg</small>
+        <div class="ph-stats"><span><b>20.6</b>mph</span><span><b>151</b>bpm</span><span><b>90</b>rpm</span></div></div>
+      <div class="ph-card"><i>Race</i><b>The Wall Race</b><small>Lap 1/1 · 8.4 mi to go</small></div>
+      <svg class="ph-map" viewBox="-40 -40 1080 760"><path d="M100 300 C100 80 400 20 600 40 C900 60 1000 200 960 360 C920 560 700 680 480 660 C220 640 100 520 100 300Z" fill="none" stroke="#5ff6ff" stroke-width="16"/><path d="M180 160 C260 90 360 60 460 44" fill="none" stroke="#ffd27a" stroke-width="22" stroke-linecap="round"/><circle cx="960" cy="360" r="34" fill="#fff" stroke="#5ff6ff" stroke-width="14"/></svg>
+      <div class="ph-emo"><span>👍</span><span>🎉</span><span>👋</span><span>🔥</span><span>💪</span><span>🙌</span></div>
+      <div class="ph-tabs"><span class="on">Ride</span><span>Races</span><span>Chat</span><span>You</span></div>
     </div>
   </div>
 </section>
@@ -353,7 +361,7 @@ details p a,.help-win a,.steps a{color:var(--cy)}
       <tbody>
         <tr><td>Mac</td><td class="yes">Now</td><td>macOS 11 or newer</td><td class="yes">Yes</td></tr>
         <tr><td>Windows PC or laptop</td><td class="yes">Now</td><td>Windows 10 or 11 with Bluetooth</td><td class="yes">Yes</td></tr>
-        <tr><td>iPhone, iPad or Android</td><td class="yes">Companion</td><td>Safari or Chrome</td><td>No: races and chat only</td></tr>
+        <tr><td>iPhone, iPad or Android</td><td class="yes">Rydehaven Remote</td><td>Safari or Chrome</td><td>No: second screen and remote</td></tr>
       </tbody>
     </table>
   </div>
@@ -367,7 +375,7 @@ details p a,.help-win a,.steps a{color:var(--cy)}
       <a class="btn primary" id="dlMac" href="https://github.com/rydehaven/rydehaven.github.io/releases/latest/download/Rydehaven-mac.dmg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/></svg>Download for Mac</a>
       <a class="btn" id="dlWin" href="https://github.com/rydehaven/rydehaven.github.io/releases/latest/download/Rydehaven-windows.exe" style="width:100%;margin-top:10px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 21h16"/></svg>Download for Windows</a>
       <p id="dlNote" role="status"></p>
-      <div class="soonbox">On your phone? Use the <a href="#companion">companion</a> for upcoming races and chat.</div>
+      <div class="soonbox">On your phone? Use <a href="#remote">Rydehaven Remote</a> for live stats, the map, the camera and chat.</div>
     </div>
     <div>
       <h2 style="font-size:clamp(30px,3.4vw,44px);margin-bottom:16px">How to install</h2>
@@ -418,7 +426,7 @@ details p a,.help-win a,.steps a{color:var(--cy)}
       <details><summary>What do I need?</summary><p>A bike on a smart trainer with Bluetooth, and a Mac or Windows computer with Bluetooth. A heart-rate strap is optional. Your trainer pairs inside the app.</p></details>
       <details><summary>Which trainers work?</summary><p>Most Bluetooth smart trainers from recent years that use the standard fitness machine protocol (FTMS), including Wahoo KICKR, Tacx, Elite and Saris. Bluetooth power meters work for power and cadence. ANT+ isn't supported yet.</p></details>
       <details><summary>Can I race other riders?</summary><p>Yes. Join a race and you line up with everyone else who joined, then race them to the line.</p></details>
-      <details><summary>Can I play on my iPhone or iPad?</summary><p>Riding needs the Rydehaven app on a Mac or PC. On your phone you can use the <a href="#companion">companion</a> to see upcoming races and chat with riders.</p></details>
+      <details><summary>Can I play on my iPhone or iPad?</summary><p>Riding needs the Rydehaven app on a Mac or PC. On your phone, use <a href="#remote">Rydehaven Remote</a> for live stats, the map, the camera and emotes while you ride, plus races and chat.</p></details>
       <details><summary>Why does my computer warn me when I open it?</summary><p>Your computer double-checks new apps the first time you open them. Follow <a href="#open-help">Mac won't open it?</a> above; you only do it once.</p></details>
       <details><summary>The trainer won't show up when I pair</summary><p>Pedal to wake it, and close any other training or phone app that's already connected, because a trainer only talks to one app at a time. Then click Pair again.</p></details>
       <details><summary>Can I host a race?</summary><p>Yes. Email <a href="mailto:rydehaven.contact@gmail.com?subject=Rydehaven%20race%20idea">rydehaven.contact@gmail.com</a> with the course, how many laps, the day and time, and who it's for.</p></details>
@@ -445,7 +453,7 @@ details p a,.help-win a,.steps a{color:var(--cy)}
   tabs.forEach((t) => (t.onclick = () => show(t.dataset.p)));
   show(isWin ? 'win' : 'mac');
   const hero = document.getElementById('heroDl'), note = document.getElementById('dlNote');
-  if (isMobile) { hero.querySelector('span').textContent = 'Get it on your computer'; hero.href = '#download'; note.innerHTML = 'Rydehaven rides on Mac and Windows. Open this page on your computer to download it, or use the <a href="companion/" style="color:var(--cy)">companion</a> on your phone.'; }
+  if (isMobile) { hero.querySelector('span').textContent = 'Get it on your computer'; hero.href = '#download'; note.innerHTML = 'Rydehaven rides on Mac and Windows. Open this page on your computer to download it, or use <a href="remote/" style="color:var(--cy)">Rydehaven Remote</a> on your phone.'; }
   else if (isWin) { hero.querySelector('span').textContent = 'Download for Windows'; hero.href = document.getElementById('dlWin').href; }
   else { hero.querySelector('span').textContent = 'Download for Mac'; hero.href = document.getElementById('dlMac').href; }
   if (isWin) { const m = document.getElementById('dlMac'), w = document.getElementById('dlWin'); m.classList.remove('primary'); w.classList.add('primary'); m.parentNode.insertBefore(w, m); w.style.marginTop = '0'; m.style.width = '100%'; m.style.marginTop = '10px'; }

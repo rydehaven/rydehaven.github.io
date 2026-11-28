@@ -50,6 +50,10 @@ async function chatToken(force = false) {
   return chatAuth;
 }
 
+// shared with remote.js: a signed-in rider, and a database address that carries the sign-in
+export async function fbAuth() { const a = await chatToken(); return { id: a.id, uid: a.uid, exp: a.exp }; }
+export const fbUrl = (path, a) => `${chatDb()}/${path}.json?auth=${encodeURIComponent(a.id)}`;
+
 // ----- muted riders (only hidden for you) -----
 const chatMuted = () => { try { return new Set(JSON.parse(localStorage.getItem(CHAT_MUTE_KEY) || '[]')); } catch (e) { return new Set(); } };
 export function chatMute(uid) { const m = chatMuted(); m.add(uid); try { localStorage.setItem(CHAT_MUTE_KEY, JSON.stringify([...m].slice(-200))); } catch (e) {} }

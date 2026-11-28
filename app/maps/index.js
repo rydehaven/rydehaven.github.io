@@ -1,9 +1,9 @@
 // maps/index.js — the WORLDS in the app. A world is one landscape (its own map file in this folder) with one or
 // more ROUTES around it, and named CLIMBS (KOM segments) on each route.
 // To add a route: add it to that world's `routes` list. To add a world: write a new map file and list it here.
-import { ALPINE } from './alpine.js?v=75';
-import { COUNTRYSIDE } from './countryside.js?v=75';
-import { RACE } from './race.js?v=75';
+import { ALPINE } from './alpine.js?v=76';
+import { COUNTRYSIDE } from './countryside.js?v=76';
+import { RACE } from './race.js?v=76';
 
 export const WORLDS = [
   { id: 'cretes', name: 'Highcrest Valley', blurb: 'Green valley racing country: fast roads and short, brutal climbs.', routes: [RACE] },

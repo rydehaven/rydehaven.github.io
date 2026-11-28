@@ -3,9 +3,9 @@
 // Each rider is matched to your level: their FTPs spread from ~18% weaker to ~18% stronger than yours (in W/kg),
 // so riding at your limit puts you mid-pack and a great day wins it.
 import * as THREE from 'three';
-import { KITS, PAINTS } from './kits.js?v=75';
-import { heightScale } from './rider.js?v=75';
-import { RIDING_STYLES } from './riderpose.js?v=75';
+import { KITS, PAINTS } from './kits.js?v=76';
+import { heightScale } from './rider.js?v=76';
+import { RIDING_STYLES } from './riderpose.js?v=76';
 
 const FIRST = ['Mateo', 'Ava', 'Lucas', 'Noor', 'Elias', 'Sofia', 'Kenji', 'Ingrid', 'Rafael', 'Maya', 'Tomás', 'Freya', 'Jonas', 'Leila', 'Owen', 'Chiara', 'Arjun', 'Hanna', 'Felix', 'Zoe', 'Dario', 'Signe', 'Malik', 'Nina'];
 const LAST = ['Vega', 'Lindqvist', 'Okafor', 'Moreau', 'Tanaka', 'Rossi', 'Novak', 'Brennan', 'Alvarez', 'Kowalski', 'Haugen', 'Duarte', 'Fischer', 'Sato', 'Murphy', 'Costa', 'Varga', 'Nilsen', 'Keller', 'Ibarra'];

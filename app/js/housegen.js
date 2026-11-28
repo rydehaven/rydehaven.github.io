@@ -6,7 +6,7 @@
 //   thatch reed_roof_03         thick roof with rounded eaves
 //   ridge  reed_roof_03_ridge   bound-reed band with stakes along the roof ridge (v = 0..1 down the band)
 //   glass                       dark window panes
-import { sampleRoute, heightAt } from './world.js?v=75';
+import { sampleRoute, heightAt } from './world.js?v=76';
 
 const MATS = ['stone', 'brick', 'wood', 'thatch', 'ridge', 'glass'];
 const newG = () => ({ pos: [], nor: [], uv: [], idx: [] });

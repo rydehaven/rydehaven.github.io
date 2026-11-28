@@ -1,6 +1,6 @@
 // houses.js — turns housegen.js output into Three.js meshes with the map's Poly Haven textures.
 import * as THREE from 'three';
-import { houseMeshes, HOUSE_MATS } from './housegen.js?v=75';
+import { houseMeshes, HOUSE_MATS } from './housegen.js?v=76';
 
 export function buildHouses({ scene, layout, map, lib, loadSlot, aniso }) {
   if (!layout.length) return;

@@ -4,9 +4,9 @@
 // and the caller scales the whole rider + bike by height (a taller rider rides a bigger bike).
 // Files are fetched and parsed ONCE; every rider (you and the race field) shares them.
 import * as THREE from 'three';
-import { makeRiderPose } from './riderpose.js?v=75';
-import { BIKE, helmetGeometry } from './bikegen.js?v=75';
-import { KITS } from './kits.js?v=75';
+import { makeRiderPose } from './riderpose.js?v=76';
+import { BIKE, helmetGeometry } from './bikegen.js?v=76';
+import { KITS } from './kits.js?v=76';
 
 const RIDER_FILES = { json: 'rider/rider.json', bin: 'rider/rider.bin', helmet: 'rider/helmet.bin', diff: 'textures/rider/kit_diff.jpg', nor: 'textures/rider/kit_nor.jpg' };
 // Helmet: "Cycle Helmet" by markchester (Sketchfab, CC BY 4.0), converted by scripts/helmet_convert.py. Credited on the Credits page.

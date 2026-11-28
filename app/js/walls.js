@@ -3,7 +3,7 @@
 //  - low PARAPETS where the road runs on an embankment (ground drops away)
 // Walls use a tiling stone texture; the cap uses one band of a trim sheet (fort_trim).
 import * as THREE from 'three';
-import { heightAt } from './world.js?v=75';
+import { heightAt } from './world.js?v=76';
 
 const STEP = 2; // meters between wall rows
 

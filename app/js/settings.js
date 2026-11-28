@@ -1,6 +1,6 @@
 // settings.js — everything the home screen lets you choose, remembered in this browser (localStorage).
-import { BIKE_OPTIONS } from './bikegen.js?v=75';
-import { PAINTS } from './kits.js?v=75';
+import { BIKE_OPTIONS } from './bikegen.js?v=76';
+import { PAINTS } from './kits.js?v=76';
 
 export const APP_NAME = 'Rydehaven';                                   // the app's name, shown in the logo and window title
 export const BASE_CDA = 0.335;                                        // rider on the hoods, before bike/wheel savings

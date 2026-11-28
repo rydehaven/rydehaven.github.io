@@ -1,7 +1,7 @@
 // world.js — map-independent world generation (no Three.js). A MAP object (see maps/) supplies:
 //   world settings, naturalHeight(x, z) and routePolyline() -> { pts: [[x, z], ...], hairpins }.
 // The ROUTE is the source of truth: road mesh, terrain carving, props and ride physics read it.
-import { fbm, smooth } from './noise.js?v=75';
+import { fbm, smooth } from './noise.js?v=76';
 export { fbm, smooth };
 
 function circularSmooth(arr, win) {

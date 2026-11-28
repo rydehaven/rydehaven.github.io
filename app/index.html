@@ -800,6 +800,17 @@ body.pm-open #pairPrompt,body.pm-open #chatToasts{display:none}
   .pm-box{height:100%} .pm-nav{padding:10px;gap:4px} .pm-nav button{min-height:38px} .pm-title b{font-size:18px}
   #chatToasts{bottom:60px;left:auto;right:12px;width:min(300px,40vw)}
 }
+
+/* Rydehaven Remote: pairing code and emotes over the rider */
+.pm-code{display:flex;gap:8px;margin:12px 0 4px}
+.pm-code span{display:grid;place-items:center;width:52px;height:64px;font:700 38px Rajdhani,sans-serif;color:#fff;background:rgba(95,246,255,.08);border:1px solid var(--cy);text-shadow:0 0 14px rgba(95,246,255,.6)}
+.pm-ok{color:#7dffb0}
+.pm-link{background:#7dffb0;box-shadow:0 0 8px #7dffb0}
+#emote{position:fixed;z-index:4;font-size:64px;line-height:1;transform:translate(-50%,-100%);pointer-events:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5))}
+#emote[hidden]{display:none}
+#emote.pop{animation:emPop 3.2s ease forwards}
+@keyframes emPop{0%{transform:translate(-50%,-60%) scale(.3);opacity:0}12%{transform:translate(-50%,-100%) scale(1.15);opacity:1}22%{transform:translate(-50%,-100%) scale(1)}80%{opacity:1}100%{transform:translate(-50%,-160%) scale(1);opacity:0}}
+@media (max-width:700px){.pm-code span{width:42px;height:54px;font-size:30px}}
 </style>
 <script>
 // show any script error on screen (so a blank page always says why)
@@ -1023,7 +1034,7 @@ body.pm-open #pairPrompt,body.pm-open #chatToasts{display:none}
   setTimeout(() => { if (document.getElementById('loading') && box.textContent === 'Loading…') fail('The 3D engine didn’t load. Quit Rydehaven and open it again; if it keeps happening, reinstall it.'); }, 20000);
 }
 </script>
-<script type="module" src="js/main.js?v=75"></script>
+<script type="module" src="js/main.js?v=76"></script>
 <div id="finishBanner" class="glass" hidden><b></b><span></span></div>
 <div id="pairPrompt" class="panel" hidden><small>No trainer connected</small><b>Pair your smart trainer to ride</b><p id="pairMsg"></p><button class="startBtn" data-devices>Pair trainer</button></div>
 <div id="qualHint" class="glass" hidden>Your computer is struggling at this quality. <button>Switch to Low</button></div>

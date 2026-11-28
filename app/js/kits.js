@@ -2,7 +2,7 @@
 // Kits are drawn by recolouring the rider's painted kit texture in the shader (see rider.js), so they cost nothing to add.
 // A kit: { id, name, miles (needed to unlock, 0 = free), jersey, shorts, accent, socks, helmet, pattern, p2 (pattern colour) }
 //   pattern: solid · band (chest band) · hoops · sash · split · fade · stripes
-import { MI } from './units.js?v=75';
+import { MI } from './units.js?v=76';
 
 export const KITS = [
   { id: 'haven', name: 'Rydehaven Teal', miles: 0, jersey: 0x11141c, shorts: 0x0b0b0e, accent: 0x2ec4b6, socks: 0xffffff, helmet: 0xf2f3f5, pattern: 'band', p2: 0x2ec4b6 },

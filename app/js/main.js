@@ -1,29 +1,30 @@
 // main.js — the shared ENGINE: start screen, then builds the chosen map (maps/*.js) and runs the ride.
 import * as THREE from 'three';
-import { buildWorld, buildRoute, sampleRoute, heightAt, gridIndex, fbm } from './world.js?v=75';
-import { SLOT_INFO, TEXLIB, SKY } from './config.js?v=75';
-import { MAPS } from '../maps/index.js?v=75';
-import { buildForest } from './trees.js?v=75';
-import { placeholder, loadSlotFromConfig, loadSlotFromFiles, loadHDR, setAnisotropy } from './textures.js?v=75';
-import { makeTerrainMaterial } from './terrainMaterial.js?v=75';
-import { buildWalls } from './walls.js?v=75';
-import { buildFinish, buildKomMarkers } from './finish.js?v=75';
-import { makeRideAudio, playSfx, stopMusic, toggleMute, getSound, setSound } from './audio.js?v=75';
-import { makePauseMenu } from './pausemenu.js?v=75';
-import { layoutHouses } from './housegen.js?v=75';
-import { buildHouses } from './houses.js?v=75';
-import { buildBike } from './bike.js?v=75';
-import { getProfile, getBikeChoice, bikeStats, getRideOptions, workoutPlan, WORKOUTS, zoneColor, noteFtp, bodyDrag, BASE_CDA } from './settings.js?v=75';
-import { showHome } from './home.js?v=75';
-import { loadRider } from './rider.js?v=75';
-import { RIDING_STYLES } from './riderpose.js?v=75';
-import { makeKomTracker, saveEffort, efforts, climbStats, fmtClock } from './settings.js?v=75';
-import { trainer, setErg, setSim } from './trainer.js?v=75';
-import { initDevices } from './devices.js?v=75';
-import { getQualityName, setQualityName, getPreset, makeScaler, LEVELS } from './quality.js?v=75';
-import { mi, mph, ft, ftStr, shortDist } from './units.js?v=75';
-import { getKit, paintById, addMeters } from './kits.js?v=75';
-import { heightScale } from './rider.js?v=75';
+import { buildWorld, buildRoute, sampleRoute, heightAt, gridIndex, fbm } from './world.js?v=76';
+import { SLOT_INFO, TEXLIB, SKY } from './config.js?v=76';
+import { MAPS } from '../maps/index.js?v=76';
+import { buildForest } from './trees.js?v=76';
+import { placeholder, loadSlotFromConfig, loadSlotFromFiles, loadHDR, setAnisotropy } from './textures.js?v=76';
+import { makeTerrainMaterial } from './terrainMaterial.js?v=76';
+import { buildWalls } from './walls.js?v=76';
+import { buildFinish, buildKomMarkers } from './finish.js?v=76';
+import { makeRideAudio, playSfx, stopMusic, toggleMute, getSound, setSound } from './audio.js?v=76';
+import { makePauseMenu } from './pausemenu.js?v=76';
+import { makeRemote } from './remote.js?v=76';
+import { layoutHouses } from './housegen.js?v=76';
+import { buildHouses } from './houses.js?v=76';
+import { buildBike } from './bike.js?v=76';
+import { getProfile, getBikeChoice, bikeStats, getRideOptions, workoutPlan, WORKOUTS, zoneColor, noteFtp, bodyDrag, BASE_CDA } from './settings.js?v=76';
+import { showHome } from './home.js?v=76';
+import { loadRider } from './rider.js?v=76';
+import { RIDING_STYLES } from './riderpose.js?v=76';
+import { makeKomTracker, saveEffort, efforts, climbStats, fmtClock } from './settings.js?v=76';
+import { trainer, setErg, setSim } from './trainer.js?v=76';
+import { initDevices } from './devices.js?v=76';
+import { getQualityName, setQualityName, getPreset, makeScaler, LEVELS } from './quality.js?v=76';
+import { mi, mph, ft, ftStr, shortDist } from './units.js?v=76';
+import { getKit, paintById, addMeters } from './kits.js?v=76';
+import { heightScale } from './rider.js?v=76';
 
 const $ = (id) => document.getElementById(id);
 const status = (t) => { $('loading').textContent = t; };
@@ -611,7 +612,9 @@ function applyBike(c, paintOnly) {
   rider.add(bike.group);
   const st = bikeStats(c); ride.mass = PROFILE.kg + st.kg; ride.CdA = BASE_CDA * bodyDrag(PROFILE) + (st.CdA - BASE_CDA);
 }
+let REMOTE = null;
 const MENU = makePauseMenu({
+  remote: () => REMOTE,
   race: !!RACE_CFG, raceName: RACE_CFG ? RACE_CFG.name : MAP.name,
   room: RACE_CFG ? 'race-' + Math.round((RACE_CFG.start || 0) / 60000) + '-' + MAP.id : 'ride-' + MAP.id,
   setPaused: (v) => { ride.paused = v; },
@@ -621,6 +624,44 @@ const MENU = makePauseMenu({
   sound: { get: getSound, set: (o) => { setSound(o); sndLabel(); } },
   leave: () => { location.hash = ''; },
 });
+// ---------- Rydehaven Remote: live stats to a phone, camera and emotes back ----------
+let remoteToasted = false;
+const EMOTES = { thumbs: '👍', party: '🎉', wave: '👋', fire: '🔥', strong: '💪', hands: '🙌' };
+const emoteEl = document.createElement('div'); emoteEl.id = 'emote'; emoteEl.hidden = true; document.body.appendChild(emoteEl);
+let emoteUntil = 0;
+function showEmote(k) { if (!EMOTES[k]) return; emoteEl.textContent = EMOTES[k]; emoteEl.hidden = false; emoteEl.classList.remove('pop'); void emoteEl.offsetWidth; emoteEl.classList.add('pop'); emoteUntil = performance.now() + 3200; }
+const emoteV = new THREE.Vector3();
+function placeEmote() {
+  if (emoteEl.hidden) return;
+  if (performance.now() > emoteUntil) { emoteEl.hidden = true; return; }
+  emoteV.copy(rider.position); emoteV.y += 2.3; emoteV.project(camera);
+  if (emoteV.z > 1) { emoteEl.style.opacity = '0'; return; }
+  emoteEl.style.opacity = ''; emoteEl.style.left = ((emoteV.x + 1) / 2 * innerWidth) + 'px'; emoteEl.style.top = ((1 - emoteV.y) / 2 * innerHeight) + 'px';
+}
+function remoteState() {
+  const L = R.length, pos = ((ride.d % L) + L) % L, sp = sampleRoute(R, ride.d), cur = KOM.current(pos, ride.t);
+  let kom = null;
+  if (cur) { const c = KOM.climbs.find((x) => x.id === cur.id), len = c ? c.b - c.a : cur.toGo + 1, best = efforts(cur.id)[0];
+    kom = { n: cur.name, e: Math.round(cur.elapsed), tg: Math.round(cur.toGo), f: +Math.max(0, Math.min(1, 1 - cur.toGo / len)).toFixed(3), b: best ? Math.round(best.t) : null }; }
+  else { let nx = null, bd = Infinity; for (const c of KOM.climbs) { let dd = c.a - pos; if (dd < 0) dd += L; if (dd < bd) { bd = dd; nx = c; } } if (nx) kom = { n: nx.name, in: Math.round(bd) }; }
+  return { p: Math.round(ride.P), w: +(ride.P / PROFILE.kg).toFixed(1), hr: trainer.hrConnected && trainer.hr ? trainer.hr : null, c: trainer.connected && trainer.cadence !== null ? Math.round(trainer.cadence) : null,
+    v: +ride.v.toFixed(2), d: Math.round(ride.d), f: +(pos / L).toFixed(4), g: +sp.grade.toFixed(3), y: Math.round(sp.y), el: Math.round(RACE_CFG ? ride.t : ride.mt),
+    cam: ride.cam, pz: ride.paused ? 1 : 0, tc: trainer.connected ? 1 : 0, kom,
+    race: RACE_CFG ? { n: RACE_CFG.name, lap: Math.min(RACE_CFG.laps, Math.floor(ride.d / L) + 1), laps: RACE_CFG.laps, tg: Math.round(Math.max(0, RACE_TOTAL - ride.d)), st: RACE_CFG.start, fin: ride.finished ? 1 : 0, ft: ride.finishT !== null && ride.finishT !== undefined ? Math.round(ride.finishT) : null } : null };
+}
+{
+  const N = 160, pts = [], elev = [];
+  for (let i = 0; i < N; i++) { const q = sampleRoute(R, (i / N) * R.length); pts.push([q.x, q.z]); elev.push(q.y); }
+  REMOTE = makeRemote({
+    route: { name: MAP.name, length: R.length, pts, elev, climbs: (MAP.climbs || []).map((c) => ({ n: c.name, a: c.from, b: c.to })) },
+    getState: remoteState,
+    onCmd: (c) => {
+      if (c.a === 'cam' && Number.isInteger(c.i) && c.i >= 0 && c.i < CAMS.length) setCam(c.i);
+      if (c.a === 'emote') showEmote(c.k);
+    },
+    onChange: () => { MENU.refreshRemote(); if (REMOTE && REMOTE.linked && !remoteToasted) { remoteToasted = true; MENU.notice('Phone linked: Rydehaven Remote is live'); } if (REMOTE && !REMOTE.linked) remoteToasted = false; },
+  });
+}
 $('pauseBtn').textContent = 'Menu';
 $('pauseBtn').onclick = () => MENU.toggle();
 $('chatBtn').onclick = () => MENU.toggle('chat');
@@ -772,6 +813,7 @@ renderer.setAnimationLoop(() => {
     $('fps').textContent = `${Math.round(scaler.fps)} fps · ${Math.round(scaler.scale * 100)}%`; }
   if (QNAME !== 'high') scaler.tick(clock.elapsedTime > 2 ? dt : 0.0001); // ignore the loading hitch
   if (scaler.struggling && QNAME === 'auto' && !lowHinted) { lowHinted = true; $('qualHint').hidden = false; }
+  placeEmote();
   renderer.render(scene, camera);
 });
 } // end startGame

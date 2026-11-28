@@ -2,21 +2,21 @@
 // One 3D garage view (your rider pedaling on the chosen bike) moves between the Home and Garage pages.
 // Every Start button saves the choice and loads the ride (#courseId in the address).
 import * as THREE from 'three';
-import { buildBike } from './bike.js?v=75';
-import { loadRider } from './rider.js?v=75';
-import { BIKE_OPTIONS } from './bikegen.js?v=75';
-import { APP_NAME, getProfile, setProfile, getBikeChoice, setBikeChoice, bikeStats, getRideOptions, setRideOptions, WORKOUTS, workoutPlan, workoutMinutes, zoneColor, flag, COUNTRY_CODES, countryName } from './settings.js?v=75';
-import { raceSchedule, canJoin, JOIN_BEFORE_MIN, RACE_EVERY_MIN } from './races.js?v=75';
-import { HOST_EMAIL } from './races.js?v=75';
+import { buildBike } from './bike.js?v=76';
+import { loadRider } from './rider.js?v=76';
+import { BIKE_OPTIONS } from './bikegen.js?v=76';
+import { APP_NAME, getProfile, setProfile, getBikeChoice, setBikeChoice, bikeStats, getRideOptions, setRideOptions, WORKOUTS, workoutPlan, workoutMinutes, zoneColor, flag, COUNTRY_CODES, countryName } from './settings.js?v=76';
+import { raceSchedule, canJoin, JOIN_BEFORE_MIN, RACE_EVERY_MIN } from './races.js?v=76';
+import { HOST_EMAIL } from './races.js?v=76';
 const PROG_SPAN_MS = RACE_EVERY_MIN * 60000 - JOIN_BEFORE_MIN * 60000;   // the countdown bar fills between races
-import { getQualityName, setQualityName } from './quality.js?v=75';
-import { startMusic, stopMusic, playSfx, getSound, setSound } from './audio.js?v=75';
-import { WORLDS } from '../maps/index.js?v=75';
-import { KITS, PAINTS, paintById, getKit, setKit, isUnlocked, totalMiles } from './kits.js?v=75';
-import { routeThumb } from './thumbs.js?v=75';
-import { mi, ftStr, lb, kgFromLb, heightStr, cmFromFtIn, ftInFromCm, shortDist, MI } from './units.js?v=75';
-import { buildFactor, heightScale } from './rider.js?v=75';
-import { climbId, climbStats, efforts, paceTime, fmtClock, PACE_WKG } from './settings.js?v=75';
+import { getQualityName, setQualityName } from './quality.js?v=76';
+import { startMusic, stopMusic, playSfx, getSound, setSound } from './audio.js?v=76';
+import { WORLDS } from '../maps/index.js?v=76';
+import { KITS, PAINTS, paintById, getKit, setKit, isUnlocked, totalMiles } from './kits.js?v=76';
+import { routeThumb } from './thumbs.js?v=76';
+import { mi, ftStr, lb, kgFromLb, heightStr, cmFromFtIn, ftInFromCm, shortDist, MI } from './units.js?v=76';
+import { buildFactor, heightScale } from './rider.js?v=76';
+import { climbId, climbStats, efforts, paceTime, fmtClock, PACE_WKG } from './settings.js?v=76';
 
 const byId = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

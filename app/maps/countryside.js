@@ -1,6 +1,6 @@
 // maps/countryside.js — ROLLING COUNTRYSIDE: a ~10 km loop of short punchy rollers through
 // farmland and pine woods, with a twisty inner section. No snow, gentle grades.
-import { fbm, smooth, gauss } from '../js/noise.js?v=75';
+import { fbm, smooth, gauss } from '../js/noise.js?v=76';
 
 export const COUNTRYSIDE = (() => {
   const world = {

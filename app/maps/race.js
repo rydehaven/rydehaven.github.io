@@ -4,7 +4,7 @@
 //
 // Unlike the other maps, the ELEVATION PROFILE is designed by hand (PROFILE below) and the land is
 // shaped around the road, so every climb is exactly as long and steep as written here.
-import { fbm, smooth } from '../js/noise.js?v=75';
+import { fbm, smooth } from '../js/noise.js?v=76';
 
 export const RACE = (() => {
   // ---- the lap, segment by segment: [length m, climb m, climb name or null] ----
